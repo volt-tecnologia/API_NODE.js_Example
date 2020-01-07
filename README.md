@@ -95,7 +95,9 @@
         Gateway: '192.168.0.1'
         Máscara de rede: '255.255.255.0'
         DNS Primário: '8.8.8.8'
-        DNS Secundário: '8.8.4.4'        
+        DNS Secundário: '8.8.4.4'   
+
+        Qualquer um dos parâmetros pode ser passado como null para manter a configuração anterior     
         */
         equip.configEthernet(false, 'Filtro de Linha', '192.168.0.91', '192.168.0.1', '255.255.255.0', '8.8.8.8', '8.8.4.4').then(res =>{
                 console.log(res); // { msg: '', responseCode: 200, data: '' }
