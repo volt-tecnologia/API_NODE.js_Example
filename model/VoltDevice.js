@@ -84,11 +84,15 @@ const FiltroSmartWeb =
                   };
 
                   
-                this.getInfo = httpGetInfo;
+                this.updateInfo = httpGetInfo;
                 this.controlTomada = ctrlAc;
                 this.configRede = configEthernet;
 
-                this.getInfo();
+                /*this.updateInfo().then(res=>{
+                    //console.log('responseCode: '+res.responseCode)
+                    this.lastInfo.jo = res.data;
+                    
+                });*/
             }
                   
 
@@ -100,10 +104,9 @@ const FiltroSmartWeb =
 
 function httpGetInfo(){
     
-    return reqGETHTTP('http://'+this.ip+'/status.json', this.options).then(res=>{
-        //console.log('responseCode: '+res.responseCode)
+    return reqGETHTTP('http://'+this.ip+'/status.json', this.options).then(res =>{
         this.lastInfo.jo = res.data;
-        
+        return res;
     });
 
 }
@@ -122,22 +125,19 @@ async function reqGETHTTP(url, options){
     });
 }
 
-async function reqPOSTHTTP(url, data, options){
-    console.log(url)
-    console.log(options)   
-     
+async function reqPOSTHTTP(url, data, options){     
     
-    return axios.post(url, data, options).then((res)=>{
-        console.log({msg:'', responseCode:res.status, data:res.data});
-        return {msg:'', responseCode:res.status, data:res.data}
+    return axios.post(url, data, options).then((res)=>{        
+        return {msg:'', responseCode:res.status, data:(res.data).includes('<!DOCTYPE html>')?'':res.data}
+    
     }).catch((err)=>{
-        console.log({msg:err, responseCode:'', data:''});
-        return {msg:err, responseCode:'', data:''};
+        
+        return {msg:err.response.status==400?'Bad Request - Verifique os dados enviados':'', responseCode:err.response.status, data:''};
     
     });
 }
 
-function ctrlAc(tomada, op, ac_name){
+function ctrlAc(tomada, op, ac_name=''){
         
     switch(op){
         case 0:
@@ -155,10 +155,13 @@ function ctrlAc(tomada, op, ac_name){
         break;
         
        case 2:
-               if(ac_name != null) 
+               if(ac_name != '') 
                return reqGETHTTP("http://" + this.ip + "/output.htm?porta=" + tomada + "&rmac=" + (this.lastInfo.getRmac(tomada)) + "&nt=" + ac_name, this.options);
                   
-               else JOptionPane.showMessageDialog(null, "Digite um nome válido para a tomada!!");
+               else {
+                   console.log("Digite um nome válido para a tomada!!");
+                   return Promise.resolve({err:'Nome inválido', responseCode:'', data:''});
+               }
                break;
                
     }
@@ -170,20 +173,25 @@ function ctrlAc(tomada, op, ac_name){
     
 }
 
-function configEthernet(boolDhcp, newhost, newip, newgtw, newmask, newdns1, newdns2){
+function configEthernet(boolDhcp = null, newhost = null, newip = null, newgtw = null, newmask = null, newdns1 = null, newdns2 = null){
 
 const params = new URLSearchParams();
-params.append('dhcp', (boolDhcp?'true':'false'));
-params.append('host', (newhost == null ? this.lastInfo.jo.devhost:newhost));
-params.append('ip', (newip == null ? this.lastInfo.jo.devip:newip));
-params.append('gw', (newgtw == null ? this.lastInfo.jo.devgtw:newgtw));
-params.append('sub', (newmask == null ? this.lastInfo.jo.devmask:newmask));
-params.append('dns1', (newdns1 == null ? this.lastInfo.jo.devdns1:newdns1));
-params.append('dns2', (newdns2 == null ? this.lastInfo.jo.devdns2:newdns2));
+params.append('dhcp', (boolDhcp == null?this.lastInfo.jo.devdhcp: boolDhcp?'true':'false'));
+params.append('host', newhost == null ? this.lastInfo.jo.devhost:newhost);
+params.append('ip', newip == null ? this.lastInfo.jo.devip:newip);
+params.append('gw', newgtw == null ? this.lastInfo.jo.devgtw:newgtw);
+params.append('sub', newmask == null ? this.lastInfo.jo.devmask:newmask);
+params.append('dns1', newdns1 == null ? this.lastInfo.jo.devdns1:newdns1);
+params.append('dns2', newdns2 == null ? this.lastInfo.jo.devdns2:newdns2);
 
-    console.log(data)
+    //console.log(data)
     return reqPOSTHTTP("http://" + this.ip + "/config.htm?", params, this.options).then(
-         reqGETHTTP("http://" + this.ip + "/reset.cgi?timeout=1", this.options)
+        res=>{
+            
+            if(res.responseCode == '200') return reqGETHTTP("http://" + this.ip + "/reset.cgi?timeout=1", this.options)
+            
+            else return Promise.resolve(res);
+        }
     );
 }
 
