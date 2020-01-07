@@ -1,7 +1,6 @@
 const axios = require('axios');
 
 
-
 const data = {
     jo:{},
     getTemp(){
@@ -60,12 +59,9 @@ const data = {
     }
 }
 
-
-
 const FiltroSmartWeb =  
     class 
-    {
-        
+    {       
         constructor (user, password, ip)
         {
             if(user == null || password == null || ip == null){
@@ -94,11 +90,8 @@ const FiltroSmartWeb =
                     
                 });*/
             }
-                  
 
-        
         }
-
         
 }
 
@@ -113,11 +106,9 @@ function httpGetInfo(){
 
 
 async function reqGETHTTP(url, options){
-    //console.log(url)
-    //console.log(options)    
+
     
     return axios.get(url, options).then((res)=>{
-        //console.log({msg:'', responseCode:res.status, data:res.data});
         return {msg:'', responseCode:res.status, data:res.data}
     }).catch((err)=>{
         return {msg:err, responseCode:'', data:''};
@@ -164,27 +155,21 @@ function ctrlAc(tomada, op, ac_name=''){
                }
                break;
                
-    }
-    
-    
-    
-    
-
+    }  
     
 }
 
 function configEthernet(boolDhcp = null, newhost = null, newip = null, newgtw = null, newmask = null, newdns1 = null, newdns2 = null){
 
-const params = new URLSearchParams();
-params.append('dhcp', (boolDhcp == null?this.lastInfo.jo.devdhcp: boolDhcp?'true':'false'));
-params.append('host', newhost == null ? this.lastInfo.jo.devhost:newhost);
-params.append('ip', newip == null ? this.lastInfo.jo.devip:newip);
-params.append('gw', newgtw == null ? this.lastInfo.jo.devgtw:newgtw);
-params.append('sub', newmask == null ? this.lastInfo.jo.devmask:newmask);
-params.append('dns1', newdns1 == null ? this.lastInfo.jo.devdns1:newdns1);
-params.append('dns2', newdns2 == null ? this.lastInfo.jo.devdns2:newdns2);
+    const params = new URLSearchParams();
+    params.append('dhcp', (boolDhcp == null?this.lastInfo.jo.devdhcp: boolDhcp?'true':'false'));
+    params.append('host', newhost == null ? this.lastInfo.jo.devhost:newhost);
+    params.append('ip', newip == null ? this.lastInfo.jo.devip:newip);
+    params.append('gw', newgtw == null ? this.lastInfo.jo.devgtw:newgtw);
+    params.append('sub', newmask == null ? this.lastInfo.jo.devmask:newmask);
+    params.append('dns1', newdns1 == null ? this.lastInfo.jo.devdns1:newdns1);
+    params.append('dns2', newdns2 == null ? this.lastInfo.jo.devdns2:newdns2);
 
-    //console.log(data)
     return reqPOSTHTTP("http://" + this.ip + "/config.htm?", params, this.options).then(
         res=>{
             
