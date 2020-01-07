@@ -84,11 +84,7 @@ const FiltroSmartWeb =
                 this.controlTomada = ctrlAc;
                 this.configRede = configEthernet;
 
-                /*this.updateInfo().then(res=>{
-                    //console.log('responseCode: '+res.responseCode)
-                    this.lastInfo.jo = res.data;
-                    
-                });*/
+                
             }
 
         }
